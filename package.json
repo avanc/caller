@@ -1,0 +1,9 @@
+{
+  "name": "Caller",
+  "version": "0.0.1",
+  "description": "Webapp to get phone numbers from desktop PC on the phone",
+  "dependencies": {
+    "express": "^4.16.4",
+    "socket.io": "^2.2.0"
+  }
+}

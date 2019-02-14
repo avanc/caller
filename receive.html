@@ -1,32 +1,37 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <title>Receiver</title>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #numbers { list-style-type: none; margin: 0; padding: 0; }
-      #numbers li { padding: 5px 10px; }
-      #numbers li:nth-child(odd) { background: #eee; }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"> <!-- Avoid IE compatibility mode, as it breaks layout -->
+    <link rel="icon" href="favicon.ico">
+
+    <title>Caller: Receive</title>
+
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> 
   </head>
+
   <body>
-    <ul id="numbers"></ul>
+    <div class="w3-card " style="max-width:600px;margin-left: auto;margin-right: auto ">
+      <div class="w3-container ">
+        Receiving phone numbers from <a href="send">send</a>
+      </div>
+      <ul id="phonenumbers" class="w3-ul w3-border-top">
+        
+      </ul>
+    </div>
     
     
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-<script>
-  $(function () {
-    var socket = io();
-    socket.on('phonenumber', function(msg){
-      $('#numbers').append('<li>'+'<a href="tel:'+msg+'">'+msg+'</a>'+'</li>');
-    });
-  });
-</script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      $(function () {
+        var socket = io();
+        socket.on('phonenumber', function(msg){
+          $('#phonenumbers').prepend('<li class="w3-bar"> <a href="tel:'+msg+'"><button class="w3-bar-item w3-button w3-black w3-round-large w3-right">Call</button></a> <div class="w3-bar-item"> <span class="w3-large">'+msg+'</span><br>               <span class="w3-tiny w3-text-grey"> </span> </div> </li>');
+        });
+      });
+    </script>
 
   </body>
-</html> 
+</html>

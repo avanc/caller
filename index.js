@@ -6,6 +6,10 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/send', function(req, res){
+  res.sendFile(__dirname + '/send.html');
+});
+
 app.get('/receive', function(req, res){
   res.sendFile(__dirname + '/receive.html');
 });

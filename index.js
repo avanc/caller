@@ -7,16 +7,32 @@ app.get('/', function(req, res){
 });
 
 app.get('/send', function(req, res){
+  console.log(req.protocol +"://" +req.headers.host + req.url+"/123");
+  res.redirect(req.protocol + "://" +req.headers.host + req.url+"/123");
+});
+
+app.get('/send/*', function(req, res){
   res.sendFile(__dirname + '/send.html');
 });
 
-app.get('/receive', function(req, res){
+app.get('/receive/*', function(req, res){
   res.sendFile(__dirname + '/receive.html');
 });
 
 io.on('connection', function(socket){
-  socket.on('phonenumber', function(msg){
-    io.emit('phonenumber', msg);
+  socket.on('room', function(room){
+    if (socket.room)
+        socket.leave(socket.room);
+
+    socket.room = room;
+    console.log("Joining room "+room);
+    
+    socket.join(room);
+  });
+  
+  socket.on('phonenumber', function(phonenumber){
+    if (socket.room)
+      io.sockets.to(socket.room).emit('phonenumber', phonenumber);
   });
 });
 

@@ -26,7 +26,13 @@
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       $(function () {
-        var socket = io();
+        var socket = io.connect();
+        var room=window.location.pathname.split('receive/').pop();
+        
+        socket.on('connect', function() {
+          socket.emit('room', room);
+        });
+        
         socket.on('phonenumber', function(msg){
           $('#phonenumbers').prepend('<li class="w3-bar"> <a href="tel:'+msg+'"><button class="w3-bar-item w3-button w3-black w3-round-large w3-right">Call</button></a> <div class="w3-bar-item"> <span class="w3-large">'+msg+'</span><br>               <span class="w3-tiny w3-text-grey"> </span> </div> </li>');
         });

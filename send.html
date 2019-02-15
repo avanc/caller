@@ -25,7 +25,7 @@
             </div>
           </form>
         </div>
-        <p>Numbers will be send to devices connected to <a href="receive">receive</a>.</p>
+        <p>Numbers will be send to devices connected to <a id="link"></a>.</p>
       </div>
     </div>
   
@@ -33,7 +33,16 @@
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       $(function () {
-        var socket = io();
+        var socket = io.connect();
+        var room=window.location.pathname.split('send/').pop();
+        var receivelink=window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/receive/" + room;
+        $('#link').attr("href", receivelink);
+        $('#link').text(receivelink);
+        
+        socket.on('connect', function() {
+          socket.emit('room', room);
+        });
+        
         $('form').submit(function(e){
           e.preventDefault(); // prevents page reloading
           socket.emit('phonenumber', $('#phonenumber').val());

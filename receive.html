@@ -14,7 +14,7 @@
   <body>
     <div class="w3-card " style="max-width:600px;margin-left: auto;margin-right: auto ">
       <div class="w3-container ">
-        Receiving phone numbers from <a href="send">send</a>
+        Receiving phone numbers from <a id="link"></a>
       </div>
       <ul id="phonenumbers" class="w3-ul w3-border-top">
         
@@ -28,6 +28,9 @@
       $(function () {
         var socket = io.connect();
         var room=window.location.pathname.split('receive/').pop();
+        var receivelink=window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/send/" + room;
+        $('#link').attr("href", receivelink);
+        $('#link').text(receivelink);
         
         socket.on('connect', function() {
           socket.emit('room', room);

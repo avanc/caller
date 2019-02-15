@@ -15,11 +15,32 @@
   <body>
     <div class="w3-card " style="max-width:600px;margin-left: auto;margin-right: auto ">
       <div class="w3-container w3-padding-16" > 
-        <p>To avoid typing phone numbers into your phone manually, you can connect your PC with your mobile phone to send phone numbers. Create a session on your PC (sender) and open the shown link on your mobile phone (receiver).</p>
+        <p>To avoid typing phone numbers into your phone manually, you can connect your PC with your mobile phone to transmit phone numbers. Create a session on your PC (sender) and open the shown link on your mobile phone (receiver).</p>
         <a href="send"><button class="w3-bar-item w3-button w3-black w3-round-large">Create Session</button></a>
+        <br>
       </div>
+
+      <div class="w3-container w3-padding-16" > 
+        <p>Or enter your session ID manually:</p>
+        <input class="w3-input w3-border w3-round-large" type="text" id="room" autocomplete="off" placeholder="session id">
+        <div class="w3-row">
+                <button id="send" onClick="load_page(this.id)" class="w3-button w3-col w3-block w3-black w3-round-large" style="width:150px">Join as sender</button>
+                <button id="receive" onClick="load_page(this.id)" class="w3-button w3-col w3-block w3-black w3-round-large" style="width:150px">Join as receiver</button>
+        </div> 
+              
+      </div>
+      
     </div>
- 
+
+    
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+        var load_page = function(destination) {
+          var room = $("#room").val();
+          var link= window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" : "") + window.location.port + "/" + destination + "/" + room;
+          window.location = link;
+        }
+    </script> 
  
   </body>
 </html>

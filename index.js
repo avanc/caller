@@ -14,29 +14,15 @@ app.get('/', function(req, res){
 
 app.get('/send', function(req, res){
   var room=uidgen.generateSync();
-  var redirect_url= url.format({
-    protocol: req.protocol,
-    host: req.get('host'),
-    pathname: "send/"+room
-  });
-  //req.protocol +"://" +req.headers.host + req.url + "/" + room;
-  console.log("First")
-  console.log(redirect_url);
-  res.redirect(redirect_url);
+  res.redirect("/send/"+room);
 });
-
-
-
-function fullUrl(req) {
-  return url.format({
-    protocol: req.protocol,
-    host: req.get('host'),
-    pathname: req.originalUrl
-  });
-}
 
 app.get('/send/*', function(req, res){
   res.sendFile(__dirname + '/send.html');
+});
+
+app.get('/receive', function(req, res){
+  res.redirect("/");
 });
 
 app.get('/receive/*', function(req, res){

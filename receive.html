@@ -36,8 +36,12 @@
           socket.emit('room', room);
         });
         
+        var last_number="";
         socket.on('phonenumber', function(msg){
-          $('#phonenumbers').prepend('<li class="w3-bar"> <a href="tel:'+msg+'"><button class="w3-bar-item w3-button w3-black w3-round-large w3-right">Call</button></a> <div class="w3-bar-item"> <span class="w3-large">'+msg+'</span><br>               <span class="w3-tiny w3-text-grey"> </span> </div> </li>');
+          if (last_number!=msg) { // Don't repeat messages on reconnect
+            last_number=msg;
+            $('#phonenumbers').prepend('<li class="w3-bar"> <a href="tel:'+msg+'"><button class="w3-bar-item w3-button w3-black w3-round-large w3-right">Call</button></a> <div class="w3-bar-item"> <span class="w3-large">'+msg+'</span><br>               <span class="w3-tiny w3-text-grey"> </span> </div> </li>');
+          }
         });
       });
     </script>

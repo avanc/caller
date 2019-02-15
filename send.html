@@ -35,7 +35,7 @@
       $(function () {
         var socket = io.connect();
         var room=window.location.pathname.split('send/').pop();
-        var receivelink=window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" : null) + window.location.port + "/receive/" + room;
+        var receivelink=window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" : "") + window.location.port + "/receive/" + room;
         $('#link').attr("href", receivelink);
         $('#link').text(receivelink);
         

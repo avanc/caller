@@ -2,14 +2,38 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+var url = require('url');
+
+const UIDGenerator = require('uid-generator');
+const uidgen = new UIDGenerator(null, UIDGenerator.BASE36, 8);
+
+
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
 app.get('/send', function(req, res){
-  console.log(req.protocol +"://" +req.headers.host + req.url+"/123");
-  res.redirect(req.protocol + "://" +req.headers.host + req.url+"/123");
+  var room=uidgen.generateSync();
+  var redirect_url= url.format({
+    protocol: req.protocol,
+    host: req.get('host'),
+    pathname: "send/"+room
+  });
+  //req.protocol +"://" +req.headers.host + req.url + "/" + room;
+  console.log("First")
+  console.log(redirect_url);
+  res.redirect(redirect_url);
 });
+
+
+
+function fullUrl(req) {
+  return url.format({
+    protocol: req.protocol,
+    host: req.get('host'),
+    pathname: req.originalUrl
+  });
+}
 
 app.get('/send/*', function(req, res){
   res.sendFile(__dirname + '/send.html');

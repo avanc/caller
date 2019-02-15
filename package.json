@@ -4,6 +4,7 @@
   "description": "Webapp to get phone numbers from desktop PC on the phone",
   "dependencies": {
     "express": "^4.16.4",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.2.0",
+    "uid-generator": "^1.0.0"
   }
 }

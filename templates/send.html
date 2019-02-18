@@ -26,28 +26,109 @@
           </form>
         </div>
         <p>Numbers will be send to devices connected to <a id="link"></a>.</p>
+       
+        <div class="w3-border">
+          <button onclick="show_hide('config')" class="w3-button w3-block w3-left-align w3-grey">Configure optional encryption</button>
+          <div id="config" class="w3-container w3-hide">
+            <input class="w3-input w3-border w3-round-large" id="password" autocomplete="off" placeholder="password" type="password">
+            <input id="store_pw" class="w3-check" type="checkbox">
+            <label>Store password in browser cache (so you don't have to enter it every time starting the browser)</label>
+          </div>
+        </div>
       </div>
     </div>
   
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/static/3rdparty/triplesec-3.0.27-min.js"></script>
+    
     <script>
-        var socket = io.connect();
-        var room=window.location.pathname.split('send/').pop();
-        var receivelink=window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" : "") + window.location.port + "/receive/" + room;
-        document.getElementById('link').setAttribute("href", receivelink);
-        document.getElementById('link').text=receivelink;
-        
-        socket.on('connect', function() {
-          socket.emit('room', room);
-        });
-        
-        document.getElementById('form').addEventListener("submit", function(e){
-          e.preventDefault(); // prevents page reloading
-          socket.emit('phonenumber', document.getElementById('phonenumber').value);
-          document.getElementById('phonenumber').value="";
-          return false;
-        });
+      function show_hide(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+          x.className += " w3-show";
+        } else {
+          x.className = x.className.replace(" w3-show", "");
+        }
+      }
+
+    
+    
+    
+    
+    
+    
+      var socket = io.connect();
+      var room=window.location.pathname.split('send/').pop();
+      var receivelink=window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" : "") + window.location.port + "/receive/" + room;
+      document.getElementById('link').setAttribute("href", receivelink);
+      document.getElementById('link').text=receivelink;
       
+      socket.on('connect', function() {
+        socket.emit('room', room);
+      });
+      console.log(triplesec)
+      
+      var storage_name="password_"+room;
+      const pw_el = document.getElementById('password');
+      const pw_store_el = document.getElementById('store_pw');
+
+
+      pw_el.value=localStorage.getItem(storage_name);
+      pw_store_el.checked = pw_el.value;
+      
+      var store_pw=pw_store_el.checked
+      
+      
+      document.getElementById('form').addEventListener("submit", function(e){
+        e.preventDefault(); // prevents page reloading
+        var phonenumber=document.getElementById('phonenumber').value;
+        if (pw_el.value) {
+          triplesec.encrypt ({
+            data:          triplesec.Buffer(phonenumber),
+            key:           triplesec.Buffer(pw_el.value),
+            progress_hook: function (obj) {  }
+          }, function(err, buff) {
+            if (! err) {
+              var ciphertext = buff.toString('hex');
+              socket.emit('phonenumber', {type:"encrypted", data:ciphertext});
+              document.getElementById('phonenumber').value="";
+            }
+          });        
+        }
+        else {
+          socket.emit('phonenumber', {type:"plain", data:phonenumber});
+          document.getElementById('phonenumber').value="";
+        }
+        return false;
+        
+      });
+    
+    
+      const typeHandler = function(e) {
+        if (store_pw) {
+          localStorage.setItem(storage_name, e.target.value);
+        }
+      }
+      
+      pw_store_el.addEventListener('click', function (e) {
+        store_pw=e.target.checked
+        if (store_pw) {
+          localStorage.setItem(storage_name, pw_el.value);
+        }
+        else {
+          localStorage.setItem(storage_name, "");
+        }
+      });
+      
+      
+      pw_el.addEventListener('input', typeHandler) // register for oninput
+      pw_el.addEventListener('propertychange', typeHandler) // for IE8
+      
+
+    
+    
+    
+    
     </script> 
 
   </body>

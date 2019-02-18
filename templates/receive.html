@@ -19,11 +19,45 @@
       <ul id="phonenumbers" class="w3-ul w3-border-top">
         
       </ul>
+      
+      <div class="w3-border">
+          <button onclick="show_hide('config')" class="w3-button w3-block w3-left-align w3-grey">Configure optional encryption</button>
+          <div id="config" class="w3-container w3-hide">
+            <input class="w3-input w3-border w3-round-large" id="password" autocomplete="off" placeholder="password" type="password">
+            <input id="store_pw" class="w3-check" type="checkbox">
+            <label>Store password in browser cache (so you don't have to enter it every time starting the browser)</label>
+          </div>
+        </div>
+      
     </div>
     
     
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/static/3rdparty/triplesec-3.0.27-min.js"></script>
+        
     <script>
+    
+      function show_hide(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+          x.className += " w3-show";
+        } else {
+          x.className = x.className.replace(" w3-show", "");
+        }
+      }
+
+    
+     var storage_name="password_"+room;
+      const pw_el = document.getElementById('password');
+      const pw_store_el = document.getElementById('store_pw');
+
+
+      pw_el.value=localStorage.getItem(storage_name);
+      pw_store_el.checked = pw_el.value;
+      
+      var store_pw=pw_store_el.checked
+   
+    
         var socket = io.connect();
         var room=window.location.pathname.split('receive/').pop();
         var receivelink=window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" : "") + window.location.port + "/send/" + room;
@@ -34,14 +68,58 @@
           socket.emit('room', room);
         });
         
-        var last_number="";
+        var last_data="";
         socket.on('phonenumber', function(msg){
-          if (last_number!=msg) { // Don't repeat messages on reconnect
-            last_number=msg;
+          if (last_data!=msg.data) { // Don't repeat messages on reconnect
+            last_datar=msg.data;
             var el= document.getElementById('phonenumbers');
-            el.innerHTML = '<li class="w3-bar"> <a href="tel:'+msg+'"><button class="w3-bar-item w3-button w3-black w3-round-large w3-right">Call</button></a> <div class="w3-bar-item"> <span class="w3-large">'+msg+'</span><br>               <span class="w3-tiny w3-text-grey"> </span> </div> </li>' + el.innerHTML;
+            
+            
+            if (msg.type=="encrypted") {
+              triplesec.decrypt ({
+                data:          triplesec.Buffer(msg.data, "hex"),
+                key:           triplesec.Buffer(pw_el.value),
+                progress_hook: function (obj) {  }
+              }, function(err, buff) {
+                if (! err) {
+                  var plaintext = buff.toString();
+                  el.innerHTML = '<li class="w3-bar"> <a href="tel:'+plaintext+'"><button class="w3-bar-item w3-button w3-black w3-round-large w3-right">Call</button></a> <div class="w3-bar-item"> <span class="w3-large">'+plaintext+'</span><br>               <span class="w3-tiny w3-text-grey"> </span> </div> </li>' + el.innerHTML;
+                }
+                else {
+                  el.innerHTML = '<li class="w3-bar"> <div class="w3-bar-item"> <span class="w3-large">'+"Decryption failed"+'</span><br>               <span class="w3-tiny w3-text-grey"> </span> </div> </li>' + el.innerHTML;
+                }
+                
+              });        
+            }
+            else {
+              el.innerHTML = '<li class="w3-bar"> <a href="tel:'+msg.data+'"><button class="w3-bar-item w3-button w3-black w3-round-large w3-right">Call</button></a> <div class="w3-bar-item"> <span class="w3-large">'+msg.data+'</span><br>               <span class="w3-tiny w3-text-grey"> </span> </div> </li>' + el.innerHTML;
+            }
+            
           }
         });
+  
+       const typeHandler = function(e) {
+        if (store_pw) {
+          localStorage.setItem(storage_name, e.target.value);
+        }
+      }
+      
+      pw_store_el.addEventListener('click', function (e) {
+        store_pw=e.target.checked
+        if (store_pw) {
+          localStorage.setItem(storage_name, pw_el.value);
+        }
+        else {
+          localStorage.setItem(storage_name, "");
+        }
+      });
+      
+      
+      pw_el.addEventListener('input', typeHandler) // register for oninput
+      pw_el.addEventListener('propertychange', typeHandler) // for IE8
+      
+
+  
   
     </script>
 

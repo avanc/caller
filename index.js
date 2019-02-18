@@ -7,9 +7,10 @@ var url = require('url');
 const UIDGenerator = require('uid-generator');
 const uidgen = new UIDGenerator(null, UIDGenerator.BASE36, 8);
 
+app.use('/static', express.static(__dirname + '/static'));
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/templates/index.html');
 });
 
 app.get('/send', function(req, res){
@@ -18,7 +19,7 @@ app.get('/send', function(req, res){
 });
 
 app.get('/send/*', function(req, res){
-  res.sendFile(__dirname + '/send.html');
+  res.sendFile(__dirname + '/templates/send.html');
 });
 
 app.get('/receive', function(req, res){
@@ -26,7 +27,7 @@ app.get('/receive', function(req, res){
 });
 
 app.get('/receive/*', function(req, res){
-  res.sendFile(__dirname + '/receive.html');
+  res.sendFile(__dirname + '/templates/receive.html');
 });
 
 io.on('connection', function(socket){
